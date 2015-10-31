@@ -17,6 +17,7 @@ if (!file.exists("../data"))       {
 # Lecture des fichiers
 
 Fonctions_AS <- read.csv("../data/Fonctions_AS.csv", fileEncoding = "UTF-16LE",sep = "\t")
+str(Fonctions_AS)
 
 Liste_AVP <- read.csv("../data/Liste_AVP.csv",fileEncoding = "UTF-16LE",sep = "\t")
 
