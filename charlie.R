@@ -155,6 +155,104 @@ Liste_AVP_voisins <- function(X, Y, rayon = 500) {
 
 Liste_AVP_voisins(586796.1,6816543,200)
 
+# ----------------------------------------------------------
+# Fonction retournant les actifs Circuit de Voie dans un rayon de p (500 m par défaut)
+# ----------------------------------------------------------
+Liste_Zones_Cdv <- read.csv("../data/Liste_Zones_Cdv.csv",fileEncoding = "UTF-16LE",sep = "\t")
+
+
+str(Liste_Zones_Cdv)
+
+Liste_Zones_Cdv$X <- 0
+Liste_Zones_Cdv$Y <- 0
+
+
+nrow(Liste_Zones_Cdv)
+head(Liste_Zones_Cdv)
+
+
+
+for (i in seq_len(nrow(Liste_CTV))) {
+  lamb <- lambert(Liste_Zones_Cdv[i,]$LIGNE,(Liste_Zones_Cdv[i,]$PKD+Liste_Zones_Cdv[i,]$PKF)/2)
+  # on prend le milieu PKD+PKF comme reference
+  if (nrow(lamb) == 1) {
+    Liste_Zones_Cdv[i,]$X <- lamb$X # Ajout des coordonnées de lambert approchés
+    Liste_Zones_Cdv[i,]$Y <- lamb$Y # Ajout des coordonnées de lambert approchés
+  } else { # cas ou l'on n'a pas trouvé de coord lambert ....
+    Liste_Zones_Cdv[i,]$X <- 0
+    Liste_Zones_Cdv[i,]$Y <- 0
+  }
+}
+
+
+
+Liste_Zones_Cdv_voisins <- function(X, Y, rayon = 500) {
+  Liste_Zones_Cdv_voisins <- Liste_Zones_Cdv
+  # Calcul et ajout de la distance euclidienne 
+  Liste_Zones_Cdv_voisins$distance <- sqrt((Liste_Zones_Cdv_voisins$X-X)^2+(Liste_Zones_Cdv_voisins$Y-Y)^2)
+  
+  Liste_Zones_Cdv_voisins <- subset(Liste_Zones_Cdv_voisins, distance < rayon)
+  Liste_Zones_Cdv_voisins
+}
+
+Liste_Zones_Cdv_voisins(586796.1,6816543,200)
+Liste_Zones_Cdv_voisins(586796.1,6816543,2000)
+
+
+
+
+
+# ----------------------------------------------------------
+# Fonctions donnant pour une voie donnée
+# le AVP le plus proche
+# le PN le plus proche
+# le Cdv le plus proche
+# ----------------------------------------------------------
+
+PN_proche <- function(ligne, pk) {
+  PN <- subset(Liste_PN, (LIGNE == ligne))
+  PN$distance <- abs(PN$PK - pk)
+  PN <- PN[which.min(PN$distance), ]
+  PN
+}
+
+
+
+
+PN <- subset(Liste_PN, (LIGNE == 752000))
+PN <- subset(Liste_PN, (LIGNE == 1000))
+PNxxx <- subset(Liste_PN, (LIGNE == 1000) & (Num_PN == 12))
+
+PN_proche(1000,32000)
+
+PNxxx_proche <- function(ligne, pk, num) {
+  PNxxx <- subset(Liste_PN, (LIGNE == ligne) & (Num_PN == num))
+  PNxxx$distance <- abs(PNxxx$PK - pk)
+  PNxxx <- PNxxx[which.min(PNxxx$distance), ]
+  PNxxx
+}
+
+PNxxx_proche(1000,32000,12)
+
+
+
+AVP_proche <- function(ligne, pk) {
+  AVP <- subset(Liste_AVP, (LIGNE == ligne))
+  AVP$distance <- abs(AVP$PK - pk)
+  AVP <- AVP[which.min(AVP$distance), ]
+  AVP
+}
+
+AVP_proche(1000,2004)
+
+Cdv_proche <- function(ligne, pk) {
+  Cdv <- subset(Liste_Zones_Cdv, (LIGNE == ligne))
+  Cdv$distance <- abs((Cdv$PKD + Cdv$PKF)/2 - pk)
+  Cdv <- Cdv[which.min(Cdv$distance), ]
+  Cdv
+}
+
+Cdv_proche(1000,2100)
 
 # ----------------------------------------------------------
 # Tentative d'association d'un actif AVP PN à un incident 
@@ -165,28 +263,154 @@ str(REX_Incidents)
 # Quelques test pour qiuelques exemples ...
 
 lamb <- lambert(REX_Incidents[1,]$LIGNE,REX_Incidents[1,]$PK)
-AVP <- Liste_AVP_voisins(lamb$X,lamb$Y,200)
-PN <- Liste_PN_voisins(lamb$X,lamb$Y,200)
-nrow(AVP)
-nrow(PN)
+AVP_voisins <- Liste_AVP_voisins(lamb$X,lamb$Y,200)
+PN_voisins <- Liste_PN_voisins(lamb$X,lamb$Y,200)
+Cdv_voisins <- Liste_Zones_Cdv_voisins(lamb$X,lamb$Y,200)
+REX_Incidents[1,]$LIGNE
+
+
+AVP_pr <- AVP_proche(REX_Incidents[1,]$LIGNE,REX_Incidents[1,]$PK)
+PN_pr <- PN_proche(REX_Incidents[1,]$LIGNE,REX_Incidents[1,]$PK)
+Cdv_pr <- Cdv_proche(REX_Incidents[1,]$LIGNE,REX_Incidents[1,]$PK)
+
+
+nrow(AVP_voisins)
+nrow(PN_voisins)
+nrow(Cdv_voisins)
 print(paste("Incident : ", 1))
-print(paste("Nombre d'apareils de voie voisins: ", nrow(AVP)))
-print(paste ("Nombre de passages à niveau voisins: ", nrow(PN)))
+print(paste("Nombre d'apareils de voie voisins: ", nrow(AVP_voisins)))
+print(paste ("Nombre de passages à niveau voisins: ", nrow(PN_voisins)))
+print(paste ("Nombre de circuit de voie voisins: ", nrow(Cdv_voisins)))
+
+print(paste ("AVP le plus proche sur la voie:", AVP_pr$distance))
+print(paste ("PN le plus proche sur la voie:", PN_pr$distance))
+print(paste ("AVP le plus proche sur la voie:", Cdv_pr$distance))
 
 
-for (i in 1:10) {
+
+for (i in c(14,22,75)) {
   lamb <- lambert(REX_Incidents[i,]$LIGNE,REX_Incidents[i,]$PK)
-  AVP <- Liste_AVP_voisins(lamb$X,lamb$Y,200)
-  PN <- Liste_PN_voisins(lamb$X,lamb$Y,200)
-  nrow(AVP)
-  nrow(PN)
-  print(paste("Incident : ", i))
-  print(paste("Nombre d'apareils de voie voisins: ", nrow(AVP)))
-  print(paste ("Nombre de passages à niveau voisins: ", nrow(PN)))
+  AVP_voisins <- Liste_AVP_voisins(lamb$X,lamb$Y,200)
+  PN_voisins <- Liste_PN_voisins(lamb$X,lamb$Y,200)
+  Cdv_voisins <- Liste_Zones_Cdv_voisins(lamb$X,lamb$Y,200)
+  
+  AVP_pr <- AVP_proche(REX_Incidents[i,]$LIGNE,REX_Incidents[i,]$PK)
+  PN_pr <- PN_proche(REX_Incidents[i,]$LIGNE,REX_Incidents[i,]$PK)
+  Cdv_pr <- Cdv_proche(REX_Incidents[i,]$LIGNE,REX_Incidents[i,]$PK)
 
+  
+    
+  
+  nrow(AVP_voisins)
+  nrow(PN_voisins)
+  nrow(Cdv_voisins)
+  
+  print(paste("Incident : ", i))
+  print(paste("Ligne: ", REX_Incidents[i,]$LIGNE))
+  print(paste("PK: ", REX_Incidents[i,]$PK))
+  
+  print(paste("Nombre d'apareils de voie voisins: ", nrow(AVP_voisins)))
+  print(paste ("Nombre de passages à niveau voisins: ", nrow(PN_voisins)))
+  print(paste ("Nombre de circuit de voie voisins: ", nrow(Cdv_voisins)))
+  print(paste ("AVP le plus proche sur la voie:", AVP_pr$distance))
+  print(paste ("PN le plus proche sur la voie:", PN_pr$distance))
+  print(paste ("Cdv le plus proche sur la voie:", Cdv_pr$distance))
+                    
   # calcul de la distance entre le plus proche et ...
 }
 
+lamb <- lambert(420000,13880)
+AVP_voisins <- Liste_AVP_voisins(lamb$X,lamb$Y,1000)
+PN_voisins <- Liste_PN_voisins(lamb$X,lamb$Y,6000)
+Cdv_voisins <- Liste_Zones_Cdv_voisins(lamb$X,lamb$Y,1000)
+
+AVP_pr <- AVP_proche(420000,13880)
+PN_pr <- PN_proche(420000,13880)
+Cdv_pr <- Cdv_proche(420000,13880)
+
+
+
+lamb <- lambert(334000,1210)
+AVP_voisins <- Liste_AVP_voisins(lamb$X,lamb$Y,200)
+PN_voisins <- Liste_PN_voisins(lamb$X,lamb$Y,600)
+Cdv_voisins <- Liste_Zones_Cdv_voisins(lamb$X,lamb$Y,200)
+
+
+AVP_pr <- AVP_proche(334000,1210)
+PN_pr <- PN_proche(334000,1210)
+Cdv_pr <- Cdv_proche(334000,1210)
+
+
+# ----------------------------------------------------------
+# Fonction cherchant les PN voisins du même nom
+
+str(Liste_PN)
+
+Liste_PNxxx_voisins <- function(X, Y, Num, rayon = 500) {
+  Liste_PNxxx_voisins <- subset(Liste_PN, (Num_PN == Num))
+
+  # Calcul et ajout de la distance euclidienne 
+  Liste_PNxxx_voisins$distance <- sqrt((Liste_PNxxx_voisins$X-X)^2+(Liste_PNxxx_voisins$Y-Y)^2)
+  
+  Liste_PNxxx_voisins <- subset(Liste_PNxxx_voisins, distance < rayon)
+  Liste_PNxxx_voisins
+}
+
+Liste_PNxxx_voisins(586796.1,6816543,12,20000)
+
+
+
+# ----------------------------------------------------------
+# Remplissage du fichier....
+# ----------------------------------------------------------
+
+str(Liste_PN)
+REX_Incidents_PN <- read.csv("../data/REX_Incidents_PN2.csv", sep = ";",check.names = FALSE)
+str(REX_Incidents_PN)
+#REX_Incidents_PN <- read.csv("../data/REX_Incidents_PN2.csv", sep = ";",check.names = FALSE,
+#                             colClasses = c("integer","integer","character","character","integer","numeric","numeric"))
+str(REX_Incidents_PN)
+head(REX_Incidents_PN)
+
+REX_Incidents_PN$Id_Armen <- 0
+REX_Incidents_PN$Confiance <- 0
+
+
+
+
+type <- REX_Incidents_PN$type_equipement_final[4]
+type
+ligne <- REX_Incidents_PN$LIGNE[4]
+pk <- REX_Incidents_PN$PK[4]
+num <- REX_Incidents_PN$num_pn[4]
+num <- as.integer(num)
+num
+PN_Candidat <- PNxxx_proche(550000,34718,26)
+
+i <- 4
+
+if (type == "PN enrichi") {
+  # PN et numéro identifié
+  PN_Candidat <- PNxxx_proche(ligne,pk,num)
+  distance <- PN_Candidat$distance
+  # verifier que le plus proche du même nom est à moins de 200 m
+  print(paste("Distance : ", distance))
+  
+  if (distance < 200) {
+    print("moins de 200 m : confirmation candidat 90% ")
+    REX_Incidents_PN$Id_Armen[i] <- PN_Candidat$Id_Armen
+    REX_Incidents_PN$Confiance[i] <- 0.9
+  } else if (distance < 1000) {
+    print("entre 200 m et 1 km: confirmation candidat 50% ")
+    REX_Incidents_PN$Id_Armen[i] <- PN_Candidat$Id_Armen
+    REX_Incidents_PN$Confiance[i] <- 0.5
+  } else {
+    print("plus de 1km : confirmation candidat < 10% ")
+  }
+} 
+else {
+  print('autre cas')
+}   
 
 
 # ----------------------------------------------------------
