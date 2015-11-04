@@ -377,7 +377,6 @@ REX_Incidents_PN$Confiance <- 0
 
 
 
-
 type <- REX_Incidents_PN$type_equipement_final[4]
 type
 ligne <- REX_Incidents_PN$LIGNE[4]
