@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Où est Charlie</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include Bootstrap Datepicker -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker.min.css" />
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/css/datepicker3.min.css" />
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.min.js"></script>
+
+<style type="text/css">
+/**
+ * Override feedback icon position
+ * See http://formvalidation.io/examples/adjusting-feedback-icon-position/
+ */
+#dateRangeForm .form-control-feedback {
+    top: 0;
+    right: -15px;
+}
+</style>
+
+    <!-- Custom CSS -->
+    <link href="css/heroic-features.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Charlie</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#donnees">Données</a>
+                    </li>
+                    <li>
+                        <a href="#qualite">Qualité BDD</a>
+                    </li>
+                    <li>
+                        <a href="#analyse">Analyse</a>
+                    </li>
+                    <li>
+                        <a href="#saisie">Saisie de données</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <!-- Jumbotron Header -->
+        <header class="jumbotron hero-spacer" id="donnees">
+            <h1>Où est Charlie !</h1>
+            <p>Le tableau de bord de la base de données socle "Où est Charlie", notre suivi du patrimoine réseaux.</p>
+        </header>
+      
+
+<!-- La BDD -->
+ <div class="row text-center">
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="css/image/surveillance.jpg" alt="">
+                    <div class="caption">
+                        <h3>PI_TAG DCT</h3>
+                        <p>Le fichier liste tous les actifs télésurveillés et comment ils sont télésurveillés.</p>
+                        <p>
+                            <a href="#" class="btn btn-primary">Charger dans Charlie</a> 
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="css/image/incidents.jpg" alt="">
+                    <div class="caption">
+                        <h3>REX Incidents</h3>
+                        <p>Le fichier liste les incidents déclarés sur les actifs.</p>
+                          <p>
+                            <a href="#" class="btn btn-primary">Charger dans Charlie</a> 
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="css/image/pn.jpg" alt="">
+                    <div class="caption">
+                        <h3>Liste_PN </h3>
+                        <p>Le fichier liste les passages à niveau.</p>
+                          <p>
+                            <a href="#" class="btn btn-primary">Charger dans Charlie</a> 
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                        <div class="thumbnail">
+                            <img src="css/image/charlie.jpg" alt="">
+                            <div class="caption">
+                                <h3>LE fichier CHARLIE </h3>
+                                <p>Le fichier BDD CHARLIE.</p>
+                                  <p>
+                            <a href="#" class="btn btn-danger">générer le fichier Charlie</a> 
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div> 
+        <!-- /.row -->
+          <!-- Title -->
+
+              <!-- Jumbotron Header -->
+        <header class="jumbotron hero-spacer" id="qualite" img src="">
+            <h1>Qualité de la BDD Charlie</h1>
+            <p>Evaluation de la qualité des données collectées et traitées dans Charlie.</p>
+        </header>
+        <!-- /.row -->
+<!-- Qualité BDD -->
+ <div class="row text-center">
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="css/image/evenement.jpg"  width="300px" height="auto" alt="">
+                    <div class="caption">
+                        <h3>Qualité globale des données</h3>
+                        <p>Par zones géographiques ou par sources de données.</p>
+                        <p>
+                            <a href="css/image/evenement.jpg" class="btn btn-primary">Visualiser</a> <a href="#" class="btn btn-default">Partager</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="css/image/maintenance.jpg"  width="300px" height="auto" alt="">
+                    <div class="caption">
+                        <h3>Les mots clés des commentaires maintenance</h3>
+                        <p>Le nuage de mots illustre le niveau d'hétérogénéité du vocabulaire utilisé.</p>
+                        <p>
+                            <a href="maintenance" class="btn btn-primary">Visualiser</a> <a href="#" class="btn btn-default">Partager</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <!-- le nuage de mot en jpg -->
+                    <div style="width: 300px; height: 300px; padding-bottom: 20px;">
+                    <script src="http://cdn.tagul.com/embed/rsiq3xdmqp47"></script>
+                    <!-- Please don't remove attribution to Tagul.com -->
+                    <div style="display: table; margin: 0 auto;"><a href="http://tagul.com/">Created with Tagul.com</a></div>
+                    </div>
+                    <div class="caption">
+                        <h3>Les mots clés des commentaires incidents</h3>
+                        <p>Le nuage de mots illustre le niveau d'hétérogénéité du vocabulaire utilisé.</p>
+                        <p>
+                            <a href="mots-incidents" class="btn btn-primary">Visualiser</a> <a href="#" class="btn btn-default">Partager</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <!-- le nuage de mot en jpg -->
+                    <img src="css/image/pk.jpg"  width="300px" height="auto" alt="">
+
+                    <div class="caption">
+                        <h3>Evolution de l'identification des PK et lignes </h3>
+                        <p>Déduction des PK et lignes dans les événements de maintenance.</p>
+                        <p>
+                            <a href="css/image/pk.jpg" class="btn btn-primary">Visualiser</a> <a href="#" class="btn btn-default">Partager</a>
+                        </p>
+                    </div>
+                </div>
+        </div>
+        
+        <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <!-- le nuage de mot en jpg -->
+                    <img src="css/image/pn-cdv.jpg"  width="300px" height="auto" alt="">
+
+                    <div class="caption">
+                        <h3>Pourcentage d'identification des PN et CDV</h3>
+                        <p>Déduction des PN et CDV par événements.</p>
+                        <p>
+                            <a href="css/image/pn-cdv.jpg" class="btn btn-primary">Visualiser</a> <a href="#" class="btn btn-default">Partager</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+    </div>
+              <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                   <img src="css/image/evolution-qualite-indicateurs_mini.jpg" alt="indicateur"/></a>
+                    <div class="caption">
+                        <h3>Evaluation de la qualité par indicateurs clés dans le temps</h3>
+                        <p>Le graphique permet d'évaluer la progression de la qualité de chaque indicateur clé.</p>
+                         <form id="dateRangeForm" method="post" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Période  : </label>
+                                    <div class="col-xs-8 date">
+                                        <div class="input-group input-append date" id="dateRangePicker">
+                                            <input type="text" class="form-control" name="date" />
+                                            <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+                                            <input type="text" class="form-control" name="date" />
+                                            <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-xs-5 col-xs-offset-3">
+                                        <button type="submit" class="btn btn-default">Valider</button>
+                                    </div>
+                                </div>
+                            </form>
+                        <p>
+                            <a href="css/image/evolution-qualite-indicateurs.jpg" class="btn btn-primary">Visualiser</a> <a href="#" class="btn btn-default">Partager</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+     </div>
+     </div>               
+   <hr>
+        <HR id="analyse">
+        <HR>
+        <!-- Title -->
+         <!-- Jumbotron Header -->
+        <header class="jumbotron hero-spacer" id="analyse">
+            <h1>L'exploitation des données Charlie !</h1>
+            
+        </header>
+        <!-- /.row -->
+
+        <!-- Accueil -->
+        <div class="row text-center">
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="http://placehold.it/800x500" alt="">
+                    <div class="caption">
+                        <h3>Incidents : localisation </h3>
+                        <p>La carto présente les nombres d'incidents par zone.</p>
+                        <p>
+                            <a href="#" class="btn btn-primary">Visualiser</a> <a href="#" class="btn btn-default">Partager</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="http://placehold.it/800x500" alt="">
+                    <div class="caption">
+                        <h3>Maintenance</h3>
+                        <p>La carto présente les nombres de maintenances par zone.</p>
+                        <p>
+                            <a href="#" class="btn btn-primary">Visualiser</a> <a href="#" class="btn btn-default">Partager</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6 hero-feature">
+                <div class="thumbnail">
+                    <img src="http://placehold.it/800x500" alt="">
+                    <div class="caption">
+                        <h3>Evaluation de la maintenance par zone</h3>
+                        <p>Le graphique présente l'évolution de la maintenance dans le temps par zone.</p>
+                       <form id="dateRangeForm" method="post" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-xs-4 control-label">Période  : </label>
+                                    <div class="col-xs-8 date">
+                                        <div class="input-group input-append date" id="dateRangePicker">
+                                            <input type="text" class="form-control" name="date" />
+                                            <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+                                            <input type="text" class="form-control" name="date" />
+                                            <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-xs-5 col-xs-offset-3">
+                                        <button type="submit" class="btn btn-default">Valider</button>
+                                    </div>
+                                </div>
+                            </form>
+                        <p>
+                            <a href="#" class="btn btn-primary">Visualiser</a> <a href="#" class="btn btn-default">Partager</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+  
+        <!-- /.row -->
+         <HR id="données">
+        <HR>
+         <!-- /.row -->
+          <!-- Title -->
+       <!-- Jumbotron Header -->
+        <header class="jumbotron hero-spacer" id="donnees">
+            <h1>Où est Charlie !</h1>
+            <p>Saisie de données terrain : à vous de jouer !</p>
+        </header>
+        <!-- /.row -->
+
+<!-- La saisie -->
+<form class="form-horizontal">
+<fieldset>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="Ou?">Ou?</label>  
+  <div class="col-md-4">
+  <input id="Ou?" name="Ou?" type="text" placeholder="noter le PK-LIGNE" class="form-control input-md" required="">
+  <span class="help-block">help</span>  
+  </div>
+</div>
+
+<!-- Button Drop Down -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="buttondropdown">Sur quoi ?</label>
+  <div class="col-md-6">
+    <div class="input-group">
+      <input id="buttondropdown" name="buttondropdown" class="form-control" placeholder="Catégorie de patrimoine" type="text" required="">
+      <div class="input-group-btn">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          Sélectionner
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu pull-right">
+          <li><a href="#">PN (Passage Niveau)</a></li>
+          <li><a href="#">CDV (Circuit de voie)</a></li>
+          <li><a href="#">Appareil de voie</a></li>
+          <li><a href="#">AUtres</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Text input-->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="textinput">Sous-catégorie :</label>  
+  <div class="col-md-4">
+  <input id="textinput" name="textinput" type="text" placeholder="Précisez." class="form-control input-md">
+  <span class="help-block">Aide</span>  
+  </div>
+</div>
+
+<!-- Button Drop Down -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="buttondropdown">Quelle action ?</label>
+  <div class="col-md-6">
+    <div class="input-group">
+      <input id="buttondropdown" name="buttondropdown" class="form-control" placeholder="Sélectionner l" type="text" required="">
+      <div class="input-group-btn">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+          Action
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu pull-right">
+          <li><a href="#">Maintenance type A</a></li>
+          <li><a href="#">Maintenance type B</a></li>
+          <li><a href="#">autres</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Textarea -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="Commentaires">Commentaires sur l'action</label>
+  <div class="col-md-4">                     
+    <textarea class="form-control" id="Commentaires" name="Commentaires">Rédiger un commentaire sur l'action en intégrant les notions suivantes : X, Y, Z.</textarea>
+  </div>
+</div>
+
+<!-- Button -->
+<div class="form-group">
+  <label class="col-md-4 control-label" for="singlebutton"></label>
+  <div class="col-md-4">
+    <button id="singlebutton" name="singlebutton" class="btn btn-primary">Envoyer</button>
+  </div>
+</div>
+
+</fieldset>
+</form>
+
+
+            
+        </form>
+        </div>
+<!-- illustration -->
+    <div><p><img src="css/image/gare.jpg" width="600px" height"auto" align="center" alt="charlie à la gare"/></p>
+    </div>
+        <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Où est Charlie- Datathon Simplon pour SNCF Réseaux - 2015</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+    <!-- /.container -->
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/dateRangePicker.js"></script>
+
+</body>
+
+</html>
