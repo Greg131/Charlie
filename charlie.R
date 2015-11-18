@@ -5,55 +5,58 @@
 setwd("~/Dropbox/Datascience/Datathon Simplon.co x SNCF/charlie")
 getwd() # Get working directory 
 
-# Les fichiers de données sont supposés être dans ../data
+# Les fichiers de données sont supposés être dans le répertoire ../data
 
 ? read.csv
 
-# Lecture des fichiers
+# ------------------------------------------------------------------------------
+# Lecture des fichier et changement en mémoire
+# ------------------------------------------------------------------------------
 
-Fonctions_AS_IdF <- read.csv("../data/Fonctions_AS_Idf.csv", fileEncoding = "UTF-16LE",sep = "\t")
-
-Liste_AVP <- read.csv("../data/Liste_AVP.csv",fileEncoding = "UTF-16LE",sep = "\t")
-
-Liste_CTV <- read.csv("../data/Liste_CTV.csv",fileEncoding = "UTF-16LE",sep = "\t")
-
-Liste_EALE <- read.csv("../data/Liste_EALE.csv",fileEncoding = "UTF-16LE",sep = "\t")
-
+## Objets de patrimoine : 
+## Passages à niveau 
 Liste_PN <- read.csv("../data/Liste_PN.csv",fileEncoding = "UTF-16LE",sep = "\t")
-
-Liste_Postes <- read.csv("../data/Liste_Postes.csv",fileEncoding = "UTF-16LE",sep = "\t")
-
-Liste_SAF_ADM <- read.csv("../data/Liste_SAF_ADM.csv",fileEncoding = "UTF-16LE",sep = "\t")
-
-Liste_Sous_Stations_SE <- read.csv("../data/Liste_Sous_Stations_SE.csv",fileEncoding = "UTF-16LE",sep = "\t")
-
+## Apareils de voie
+Liste_AVP <- read.csv("../data/Liste_AVP.csv",fileEncoding = "UTF-16LE",sep = "\t")
+## Circuits de voie
 Liste_Zones_Cdv <- read.csv("../data/Liste_Zones_Cdv.csv",fileEncoding = "UTF-16LE",sep = "\t")
 
-PI_TAG <- read.csv("../data/PI_TAG DCT.csv", sep = ";",check.names = FALSE)
-#PI_TAG2 <- read.csv("../data/PI_TAG DCT.csv", sep = ";",header = FALSE, skip = 1)
-# pb dans les noms de variables à régler
-
-Referentiel_geolocalisation <- read.csv("../data/Referentiel geolocalisation.csv", sep = ";")
-
-REX_SIG <- read.csv("../data/REX SIG.csv", sep = ";",check.names = FALSE)
-
+## Fichiers d'incidents :
+## Maintenance 
 REX_Incidents <- read.csv("../data/REX_Incidents.csv", sep = ";",check.names = FALSE)
+REX_SIG <- read.csv("../data/REX SIG.csv", sep = ";",check.names = FALSE)
+## Suivi des composants
+PI_TAG_DCT <- read.csv("../data/PI_TAG DCT.csv", sep = ";",check.names = FALSE)
+## Installation signal
+Fonctions_AS_IdF <- read.csv("../data/Fonctions_AS_Idf.csv", fileEncoding = "UTF-16LE",sep = "\t")
 
-Temperatures_PI <- read.csv("../data/Temperatures_PI.csv", sep = "\t",dec = ",")
-
-# ----------------------------------------------------------
-# Fonction donnant les coordonnées Lambert 
-# X Y à partir d'une voie et d'un PK
-# ----------------------------------------------------------
-
+## Référentiel geolocalisation
 Referentiel_geolocalisation <- read.csv("../data/Referentiel geolocalisation.csv", sep = ";", dec = ",",
                                         colClasses = c("integer","integer","numeric","numeric"))
 
+
+
+
+#Liste_CTV <- read.csv("../data/Liste_CTV.csv",fileEncoding = "UTF-16LE",sep = "\t")
+#Liste_EALE <- read.csv("../data/Liste_EALE.csv",fileEncoding = "UTF-16LE",sep = "\t")
+#Liste_Postes <- read.csv("../data/Liste_Postes.csv",fileEncoding = "UTF-16LE",sep = "\t")
+#Liste_SAF_ADM <- read.csv("../data/Liste_SAF_ADM.csv",fileEncoding = "UTF-16LE",sep = "\t")
+#Liste_Sous_Stations_SE <- read.csv("../data/Liste_Sous_Stations_SE.csv",fileEncoding = "UTF-16LE",sep = "\t")
+#Temperatures_PI <- read.csv("../data/Temperatures_PI.csv", sep = "\t",dec = ",")
+
+# ------------------------------------------------------------------------------
+# Fonction donnant les coordonnées Lambert 
+# X Y à partir d'une voie et d'un PK
+# ------------------------------------------------------------------------------
+
+## Exploration table geolocalisation
 head(Referentiel_geolocalisation)
 tail(Referentiel_geolocalisation)
 summary(Referentiel_geolocalisation)
 str(Referentiel_geolocalisation)
-
+names(Referentiel_geolocalisation)
+## Liste des lignes
+unique(Referentiel_geolocalisation$LIGNE)
 
 lambert <- function(ligne, pk) {
   Ref <- subset(Referentiel_geolocalisation, (LIGNE == ligne))
@@ -61,47 +64,203 @@ lambert <- function(ligne, pk) {
   Ref[which.min(Ref$distance), ]
 }
 
-
+## Tests
 a <- lambert(1000,1000)
 b <- lambert(1000,100)
+
+lambert(963506,130233)
+lambert(242910,130233)
+lambert(963506,130233)
+lambert(963506,130233)
 
 a$X
 b$Y
 a
 
-# ----------------------------------------------------------
-# Fonction retournant les actifs PN dans un rayon de p (500 m par défaut)
-# ----------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Ajout des coordonnés Lambert approchés X et Y aux objets de patrimoine
+# ------------------------------------------------------------------------------
 
-Liste_PN <- read.csv("../data/Liste_PN.csv",fileEncoding = "UTF-16LE",sep = "\t")
-
-str(Liste_PN)
+## Passages à niveau
 
 Liste_PN$X <- 0
 Liste_PN$Y <- 0
+Liste_PN$ApproxLambert <- -1
 
-for (i in 1:100) {
-  test <- lambert(Liste_PN[i,]$LIGNE,Liste_PN[i,]$PK)$distance
-  print(i) ; print(test)
-}
-
-lambert(963506,3671)
-nrow(lambert(963506,3671))
-
-nrow(Liste_PN)
-
-
-# Ajout des coordonnées de lambert approchés au data frame
 for (i in seq_len(nrow(Liste_PN))) {
-  lamb <- lambert(Liste_PN[i,]$LIGNE,Liste_PN[i,]$PK)
-  if (nrow(lamb) == 1) {
-    Liste_PN[i,]$X <- lamb$X 
-    Liste_PN[i,]$Y <- lamb$Y 
-  } else { # cas ou l'on n'a pas trouvé de coord lambert ....
-    Liste_PN[i,]$X <- 0
-    Liste_PN[i,]$Y <- 0
-  }
+        lamb <- lambert(Liste_PN[i,]$LIGNE,Liste_PN[i,]$PK)
+        if (nrow(lamb) == 1) {
+                Liste_PN[i,]$X <- lamb$X 
+                Liste_PN[i,]$Y <- lamb$Y 
+                Liste_PN[i,]$ApproxLambert <- lamb$distance 
+        } else { # cas ou l'on n'a pas trouvé de coordonné lambert ....
+                Liste_PN[i,]$X <- 0
+                Liste_PN[i,]$Y <- 0
+                Liste_PN[i,]$ApproxLambert <- -1
+        }
 }
+
+## Estimation et exploration des trous 
+missing <- subset(Liste_PN, ApproxLambert == -1)
+nrow(missing)
+rate <- 1-nrow(missing)/(nrow(Liste_PN))
+rate
+## 95,5%
+unique(missing$LIGNE)
+## les lignes 963506 570316 687000 242910 233000 ne figurents pas dans la base 
+## de géolocalisation
+eval <- subset(Liste_PN, ApproxLambert != -1)
+mean(eval$ApproxLambert)
+## 93 m
+sd(eval$ApproxLambert)
+max(eval$ApproxLambert)
+## > 5000 m !
+hist(eval$ApproxLambert, col = "green", breaks = 100, 
+     main = "PN Histogram of geolocalisation approx", xlab = "Approx in m")
+hist(eval$ApproxLambert, col = "green", breaks = 100, 
+     main = "PN Histogram of geolocalisation approx", xlab = "Approx in m",
+     xlim = c(0,500))
+abline(v=median(eval$ApproxLambert), col = "red" ,lwd =2)
+
+## Etude de l'approximation de géolocalisation
+far <- subset(Liste_PN, ApproxLambert > 1000)
+nrow(far)
+rate <- 1 - nrow(far)/nrow(eval)
+rate
+## 99,3% approximés à moin de 1000 m
+## Visualisation localisation et approximations ...
+eval <- subset(Liste_PN, ApproxLambert != -1)
+eval$far <- "Close"
+eval[eval$ApproxLambert > 1000,]$far <- "Far"
+with(subset(eval, far == "Close"), plot(X,Y, col = "black", main = "Passages à niveau"))
+with(subset(eval, far == "Far"), points(X,Y, col = "red", pch = 4))
+legend("topright", pch = c(1,4), col = c("black","red"), legend = c("OK",">1000m"))
+
+
+## Appareils de voie
+
+Liste_AVP$X <- 0
+Liste_AVP$Y <- 0
+Liste_AVP$ApproxLambert <- -1
+
+for (i in seq_len(nrow(Liste_AVP))) {
+        lamb <- lambert(Liste_AVP[i,]$LIGNE,Liste_AVP[i,]$PK)
+        if (nrow(lamb) == 1) {
+                Liste_AVP[i,]$X <- lamb$X # Ajout des coordonnées de lambert approchés
+                Liste_AVP[i,]$Y <- lamb$Y # Ajout des coordonnées de lambert approchés
+                Liste_AVP[i,]$ApproxLambert <- lamb$distance # Ajout des coordonnées de lambert approchés
+        } else { # cas ou l'on n'a pas trouvé de coord lambert ....
+                Liste_AVP[i,]$X <- 0
+                Liste_AVP[i,]$Y <- 0
+                Liste_AVP[i,]$ApproxLambert <- -1
+        }
+}
+
+## Estimation et exploration des trous 
+missing <- subset(Liste_AVP, ApproxLambert == -1)
+nrow(missing)
+rate <- 1-nrow(missing)/(nrow(Liste_AVP))
+rate
+## 99,7%
+unique(missing$LIGNE)
+## les lignes 72311  70606 242910 272316 752321 570316 762000 956306 957306 
+## 963506 980106 ne figurents pas dans la base de géolocalisation
+## Distribution de l'approximation
+eval <- subset(Liste_AVP, ApproxLambert != -1)
+mean(eval$ApproxLambert)
+## 82 m
+sd(eval$ApproxLambert)
+max(eval$ApproxLambert)
+## > 5000 m !
+hist(eval$ApproxLambert, col = "green", breaks = 100, 
+     main = "PN Histogram of geolocalisation approx", xlab = "Approx in m")
+hist(eval$ApproxLambert, col = "green", breaks = 100, 
+     main = "PN Histogram of geolocalisation approx", xlab = "Approx in m",
+     xlim = c(0,500))
+abline(v=median(eval$ApproxLambert), col = "red" ,lwd =2)
+## Etude de l'approximation de géolocalisation
+far <- subset(Liste_AVP, ApproxLambert > 1000)
+nrow(far)
+rate <- 1 - nrow(far)/nrow(eval)
+rate
+## 99,6% approximés à moin de 1000 m
+## Visualisation localisation et approximations ...
+eval <- subset(Liste_AVP, ApproxLambert != -1)
+eval$far <- "Close"
+eval[eval$ApproxLambert > 1000,]$far <- "Far"
+with(subset(eval, far == "Close"), plot(X,Y, col = "black", main = "Appareils de voie"))
+with(subset(eval, far == "Far"), points(X,Y, col = "red", pch = 4))
+legend("topright", pch = c(1,4), col = c("black","red"), legend = c("OK",">1000m"))
+
+
+
+## Circuits de voie
+
+Liste_Zones_Cdv$X <- 0
+Liste_Zones_Cdv$Y <- 0
+Liste_Zones_Cdv$ApproxLambert <- -1
+
+for (i in seq_len(nrow(Liste_Zones_Cdv))) {
+        lamb <- lambert(Liste_Zones_Cdv[i,]$LIGNE,(Liste_Zones_Cdv[i,]$PKD+Liste_Zones_Cdv[i,]$PKF)/2)
+        # on prend le milieu PKD+PKF comme reference
+        if (nrow(lamb) == 1) {
+                Liste_Zones_Cdv[i,]$X <- lamb$X # Ajout des coordonnées de lambert approchés
+                Liste_Zones_Cdv[i,]$Y <- lamb$Y # Ajout des coordonnées de lambert approchés
+                Liste_Zones_Cdv[i,]$ApproxLambert <- lamb$distance 
+        } else { # cas ou l'on n'a pas trouvé de coord lambert ....
+                Liste_Zones_Cdv[i,]$X <- 0
+                Liste_Zones_Cdv[i,]$Y <- 0 
+                Liste_Zones_Cdv[i,]$ApproxLambert <- -1
+        }
+}
+
+
+
+## Estimation et exploration des trous 
+missing <- subset(Liste_Zones_Cdv, ApproxLambert == -1)
+nrow(missing)
+rate <- 1-nrow(missing)/(nrow(Liste_Zones_Cdv))
+rate
+## 99,9%
+unique(missing$LIGNE)
+## les lignes 272316 963506 752321 570316  72311 956306 
+## ne figurents pas dans la base de géolocalisation
+## Distribution de l'approximation
+eval <- subset(Liste_Zones_Cdv, ApproxLambert != -1)
+mean(eval$ApproxLambert)
+## 89 m
+sd(eval$ApproxLambert)
+max(eval$ApproxLambert)
+## > 5000 m !
+hist(eval$ApproxLambert, col = "green", breaks = 100, 
+     main = "CDV Histogram of geolocalisation approx", xlab = "Approx in m")
+hist(eval$ApproxLambert, col = "green", breaks = 100, 
+     main = "CDV Histogram of geolocalisation approx", xlab = "Approx in m",
+     xlim = c(0,500))
+abline(v=median(eval$ApproxLambert), col = "red" ,lwd =2)
+## Etude de l'approximation de géolocalisation
+far <- subset(Liste_Zones_Cdv, ApproxLambert > 1000)
+nrow(far)
+rate <- 1 - nrow(far)/nrow(eval)
+rate
+## 99,6% approximés à moin de 1000 m
+## Visualisation localisation et approximations ...
+eval <- subset(Liste_Zones_Cdv, ApproxLambert != -1)
+eval$far <- "Close"
+eval[eval$ApproxLambert > 1000,]$far <- "Far"
+with(subset(eval, far == "Close"), plot(X,Y, col = "black", main = "Circuits de voie"))
+with(subset(eval, far == "Far"), points(X,Y, col = "red", pch = 4))
+legend("topright", pch = c(1,4), col = c("black","red"), legend = c("OK",">1000m"))
+
+# ------------------------------------------------------------------------------
+# Construction d'une base de patrimoine
+# ------------------------------------------------------------------------------
+
+# a developper....
+
+# ------------------------------------------------------------------------------
+# Fonction retournant les actifs PN dans un rayon de p (500 m par défaut)
+# ------------------------------------------------------------------------------
 
 Liste_PN_voisins <- function(X, Y, rayon = 500) {
   Liste_PN_voisins <- Liste_PN
@@ -115,34 +274,9 @@ Liste_PN_voisins <- function(X, Y, rayon = 500) {
 Liste_PN_voisins(586796.1,6816543,2000)
 Liste_PN_voisins(586796.1,6816543,200)
 
-
 # ----------------------------------------------------------
 # Fonction retournant les actifs AVP dans un rayon de p (500 m par défaut)
 # ----------------------------------------------------------
-Liste_AVP <- read.csv("../data/Liste_AVP.csv",fileEncoding = "UTF-16LE",sep = "\t")
-
-str(Liste_AVP)
-
-Liste_AVP$X <- 0
-Liste_AVP$Y <- 0
-
-
-nrow(Liste_AVP)
-
-
-
-for (i in seq_len(nrow(Liste_AVP))) {
-  lamb <- lambert(Liste_AVP[i,]$LIGNE,Liste_AVP[i,]$PK)
-  if (nrow(lamb) == 1) {
-    Liste_AVP[i,]$X <- lamb$X # Ajout des coordonnées de lambert approchés
-    Liste_AVP[i,]$Y <- lamb$Y # Ajout des coordonnées de lambert approchés
-  } else { # cas ou l'on n'a pas trouvé de coord lambert ....
-    Liste_AVP[i,]$X <- 0
-    Liste_AVP[i,]$Y <- 0
-  }
-}
-
-
 
 Liste_AVP_voisins <- function(X, Y, rayon = 500) {
   Liste_AVP_voisins <- Liste_AVP
@@ -155,36 +289,9 @@ Liste_AVP_voisins <- function(X, Y, rayon = 500) {
 
 Liste_AVP_voisins(586796.1,6816543,200)
 
-# ----------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Fonction retournant les actifs Circuit de Voie dans un rayon de p (500 m par défaut)
-# ----------------------------------------------------------
-Liste_Zones_Cdv <- read.csv("../data/Liste_Zones_Cdv.csv",fileEncoding = "UTF-16LE",sep = "\t")
-
-
-str(Liste_Zones_Cdv)
-
-Liste_Zones_Cdv$X <- 0
-Liste_Zones_Cdv$Y <- 0
-
-
-nrow(Liste_Zones_Cdv)
-head(Liste_Zones_Cdv)
-
-
-
-for (i in seq_len(nrow(Liste_CTV))) {
-  lamb <- lambert(Liste_Zones_Cdv[i,]$LIGNE,(Liste_Zones_Cdv[i,]$PKD+Liste_Zones_Cdv[i,]$PKF)/2)
-  # on prend le milieu PKD+PKF comme reference
-  if (nrow(lamb) == 1) {
-    Liste_Zones_Cdv[i,]$X <- lamb$X # Ajout des coordonnées de lambert approchés
-    Liste_Zones_Cdv[i,]$Y <- lamb$Y # Ajout des coordonnées de lambert approchés
-  } else { # cas ou l'on n'a pas trouvé de coord lambert ....
-    Liste_Zones_Cdv[i,]$X <- 0
-    Liste_Zones_Cdv[i,]$Y <- 0
-  }
-}
-
-
+# ------------------------------------------------------------------------------
 
 Liste_Zones_Cdv_voisins <- function(X, Y, rayon = 500) {
   Liste_Zones_Cdv_voisins <- Liste_Zones_Cdv
@@ -198,16 +305,12 @@ Liste_Zones_Cdv_voisins <- function(X, Y, rayon = 500) {
 Liste_Zones_Cdv_voisins(586796.1,6816543,200)
 Liste_Zones_Cdv_voisins(586796.1,6816543,2000)
 
-
-
-
-
-# ----------------------------------------------------------
-# Fonctions donnant pour une voie donnée
-# le AVP le plus proche
-# le PN le plus proche
-# le Cdv le plus proche
-# ----------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Fonctions donnant pour une voie donnée et un pk donné
+# le AVP le plus proche sur la ligne
+# le PN le plus proche sur la ligne
+# le Cdv le plus proche sur la ligne
+# ------------------------------------------------------------------------------
 
 PN_proche <- function(ligne, pk) {
   PN <- subset(Liste_PN, (LIGNE == ligne))
@@ -215,13 +318,6 @@ PN_proche <- function(ligne, pk) {
   PN <- PN[which.min(PN$distance), ]
   PN
 }
-
-
-
-
-PN <- subset(Liste_PN, (LIGNE == 752000))
-PN <- subset(Liste_PN, (LIGNE == 1000))
-PNxxx <- subset(Liste_PN, (LIGNE == 1000) & (Num_PN == 12))
 
 PN_proche(1000,32000)
 
@@ -233,6 +329,7 @@ PNxxx_proche <- function(ligne, pk, num) {
 }
 
 PNxxx_proche(1000,32000,12)
+PNxxx_proche(10001,32000,12)
 
 
 
@@ -254,10 +351,242 @@ Cdv_proche <- function(ligne, pk) {
 
 Cdv_proche(1000,2100)
 
-# ----------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------
+# Analyse du fichier REX_Incidents
+# ------------------------------------------------------------------------------
+
+str(REX_Incidents)
+summary(REX_Incidents)
+
+## Fichiers d'incidents :
+## Maintenance 
+REX_Incidents <- read.csv("../data/REX_Incidents.csv", sep = ";",
+                          check.names = FALSE, fileEncoding = "WINDOWS-1252")
+
+REX_Incidents <- read.csv("../data/REX_Incidents.csv", sep = ";",
+                          check.names = FALSE,nrows = 200, fileEncoding = "WINDOWS-1252")
+
+REX_Incidents$Type <- "Inconnu"
+
+names(REX_Incidents)
+## Analyse du champ `IO - Libellé de la ressource`
+## Champ Commencant par PN suivit d'un espace ou d'un chiffre (eliminer VPN, PNO, ...)
+liste <- grep("^PN ", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+length(liste)
+REX_Incidents[liste,]$`IO - Libellé de la ressource`
+REX_Incidents[liste,]$Type <- "PN"
+
+liste <- grep("^PN[0-9]", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+length(liste)
+REX_Incidents[liste,]$`IO - Libellé de la ressource`
+REX_Incidents[liste,]$Type <- "PN"
+
+## PN précédé par autre chose qu'une lettre et suivit d'un espace ou d'un chiffre
+liste <- grep("[^A-Z]PN ", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+length(liste)
+REX_Incidents[liste,]$`IO - Libellé de la ressource`
+REX_Incidents[liste,]$Type <- "PN"
+
+liste <- grep("[^A-Z]PN[0-9]", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+length(liste)
+REX_Incidents[liste,]$`IO - Libellé de la ressource`
+REX_Incidents[liste,]$Type <- "PN"
+
+
+nrow(subset(REX_Incidents, Type == "PN"))
+nrow(subset(REX_Incidents, Type == "PN"))/nrow(REX_Incidents)
+
+## Idem avec champ `IO - Commentaires 1`
+
+## Champ Commencant par PN ....
+liste <- grep("^PN", REX_Incidents$`IO - Commentaires 1`, ignore.case = TRUE)
+length(liste)
+## Aucun
+
+## PN précédé par autre chose qu'une lettre et suivit d'un espace ou d'un chiffre
+liste <- grep("[^A-Z]PN ", REX_Incidents$`IO - Commentaires 1`, ignore.case = TRUE)
+length(liste)
+REX_Incidents[liste,]$`IO - Libellé de la ressource`
+REX_Incidents[liste,]$`IO - Commentaires 1`
+REX_Incidents[liste,]$Type <- "PN"
+
+liste <- grep("[^A-Z]PN[0-9]", REX_Incidents$`IO - Commentaires 1`, ignore.case = TRUE)
+length(liste)
+REX_Incidents[liste,]$`IO - Libellé de la ressource`
+REX_Incidents[liste,]$`IO - Commentaires 1`
+REX_Incidents[liste,]$Type <- "PN"
+
+
+nrow(subset(REX_Incidents, Type == "PN"))
+nrow(subset(REX_Incidents, Type == "PN"))/nrow(REX_Incidents)
+## 2429 occurences 4,6%
+
+## Extraction d'un numéro de PN .....
+
+REX_Incidents$Num_PN <- -1
+REX_Incidents$Cas <- "NA"
+
+## On commence par une recherche dans `IO - Commentaires 1` puis on écrasera 
+## éventuellement un numéro de PN trouvé dans `IO - Libellé de la ressource`
+
+## `IO - Commentaires 1`
+
+index <- grep("PN[0-9]{1}", REX_Incidents$`IO - Commentaires 1`, ignore.case = TRUE)
+length(index)
+pos <- regexpr("PN[0-9]{1}",REX_Incidents$`IO - Commentaires 1`, ignore.case = TRUE)
+val <- as.numeric(substr(REX_Incidents$`IO - Commentaires 1`[index], pos[index]+2, pos[index]+2))
+REX_Incidents[index,]$Num_PN <- val
+REX_Incidents[index,]$Cas <- "Premier PN cité dans commentaire taille >= 1 digit"
+
+
+index <- grep("PN[0-9]{2}", REX_Incidents$`IO - Commentaires 1`, ignore.case = TRUE)
+length(index)
+pos <- regexpr("PN[0-9]{2}",REX_Incidents$`IO - Commentaires 1`, ignore.case = TRUE)
+val <- as.numeric(substr(REX_Incidents$`IO - Commentaires 1`[index], pos[index]+2, pos[index]+3))
+REX_Incidents[index,]$Num_PN <- val
+REX_Incidents[index,]$Cas <- "Premier PN cité dans commentaire taille >= 2 digit"
+
+
+index <- grep("PN[0-9]{3}", REX_Incidents$`IO - Commentaires 1`, ignore.case = TRUE)
+length(index)
+pos <- regexpr("PN[0-9]{3}",REX_Incidents$`IO - Commentaires 1`, ignore.case = TRUE)
+val <- as.numeric(substr(REX_Incidents$`IO - Commentaires 1`[index], pos[index]+2, pos[index]+4))
+REX_Incidents[index,]$Num_PN <- val
+REX_Incidents[index,]$Cas <- "Premier PN cité dans commentaire taille >= 3 digit"
+
+## `IO - Libellé de la ressource`
+
+index <- grep("PN[0-9]{1}", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+length(index)
+pos <- regexpr("PN[0-9]{1}",REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+val <- as.numeric(substr(REX_Incidents$`IO - Libellé de la ressource`[index], pos[index]+2, pos[index]+2))
+REX_Incidents[index,]$Num_PN <- val
+REX_Incidents[index,]$Cas <- "Premier PN cité dans lib taille >= 3 digit"
+
+
+index <- grep("PN[0-9]{2}", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+length(index)
+pos <- regexpr("PN[0-9]{2}",REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+val <- as.numeric(substr(REX_Incidents$`IO - Libellé de la ressource`[index], pos[index]+2, pos[index]+3))
+REX_Incidents[index,]$Num_PN <- val
+REX_Incidents[index,]$Cas <- "Premier PN cité dans lib taille >= 3 digit"
+
+
+index <- grep("PN[0-9]{3}", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+length(index)
+pos <- regexpr("PN[0-9]{3}",REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+val <- as.numeric(substr(REX_Incidents$`IO - Libellé de la ressource`[index], pos[index]+2, pos[index]+4))
+REX_Incidents[index,]$Num_PN <- val
+REX_Incidents[index,]$Cas <- "Premier PN cité dans lib taille >= 3 digit"
+
+## Nombre de numéro de PN trouvés
+nrow(subset(REX_Incidents, (Num_PN != -1)))
+nrow(subset(REX_Incidents, (Num_PN != -1) & (Type == "PN")))
+
+df <- subset(REX_Incidents, (Num_PN != -1) & (Type != "PN"))
+df$`IO - Libellé de la ressource`
+# RPN...
+res <- subset(REX_Incidents, (Num_PN != -1))
+res$Num_PN
+res$`IO - Libellé de la ressource`
+head(res)
+
+index <- grep("PN[0-9]{3}", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+index <- grep("PN [0-9]{3}", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+
+'a[^bct]'
+
+liste <- grep("^PN[0-9][0-9][0-9]", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+length(liste)
+REX_Incidents[liste,]$`IO - Libellé de la ressource`
+REX_Incidents[liste,]$`IO - Commentaires 1`
+
+liste <- grep("^PN[0-9]{3}", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+length(liste)
+REX_Incidents[liste,]$`IO - Libellé de la ressource`
+REX_Incidents[liste,]$`IO - Commentaires 1`
+
+vecteur <- c("456  PN444","pn5555xxx","pn5","test","PNO","PN289")
+grep("PN[0-9]{3}",vecteur, ignore.case = TRUE,value = TRUE)
+index <- grep("PN[0-9]{3}",vecteur, ignore.case = TRUE)
+pos <- regexpr("PN[0-9]{3}",vecteur, ignore.case = TRUE)
+pos
+pos[1]
+
+substr(vecteur[1], pos[1]+2, pos[1]+4)
+as.numeric(substr(vecteur[1], pos[1]+2, pos[1]+4))
+
+
+substr(vecteur[index], pos[index]+2, pos[index]+4)
+as.numeric(substr(vecteur[index], pos[index]+2, pos[index]+4))
+
+index
+
+index <- grep("PN[0-9]{3}", REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+pos <- regexpr("PN[0-9]{3}",REX_Incidents$`IO - Libellé de la ressource`, ignore.case = TRUE)
+val <- as.numeric(substr(REX_Incidents$`IO - Libellé de la ressource`[index], pos[index]+2, pos[index]+4))
+REX_Incidents[index,]$Num_PN <- val
+
+
+regexpr("PN[0-9]{3}^5",c("==PN444","-----pn5555","pn5"), ignore.case = TRUE)
+regexpr("PN[0-9]{2}[^X]",c("==PN44xxx","-----pn5555","pn5"), ignore.case = TRUE)
+regexpr("PN[0-9]{2}[^0123456789]",c("==PN44xxx","-----pn5555","pn5"), ignore.case = TRUE)
+regexpr("PN[0-9]{4}[^0123456789]",c("==PN44xxx","-----pn5555ww","pn5","PN28 9","PN27"), ignore.case = TRUE)
+regexpr("PN[0-9]{4}[^0-9]",c("==PN44xxx","-----pn5555ww","pn5","PN28 9","PN27"), ignore.case = TRUE)
+gregexpr("PN[0-9]{3}",c("==PN444","-----pn5555","pn5"), ignore.case = TRUE)
+regexec("PN[0-9]{3}",c("==PN444","-----pn5555","pn5"), ignore.case = TRUE)
+
+?grep
+substr("abcdef", 2, 4)
+
+?grep
+regexpr("PN", REX_Incidents[liste,]$`IO - Libellé de la ressource`,ignore.case = TRUE)
+
+grep("a","b")
+
+substr("abcdef", 2, 4)
+
+regexpr("PN", c("AAAPNAAA","XP2XXXNX","PN","XX28XXX","PN","XXXXX","PN","XXXXX","PN"))
+
+regexpr("[1234567890]", c("AAAPNAAA","XPX28XXNX","PN","XXXXX","PN","XXXXX","PN","XXXXX","PN"))
+regexpr("[1234567890]", c("AAAPNAAA","XPX28XXNX","PN","XXXXX","PN","XXXXX","PN","XXXXX","PN"))
+regexpr("[0-9]", c("AAAPNAAA","XPX28XXNX","PN","XX2XXX","PN","XXXXX","PN","XXXXX","PN"))
+regexpr("[0-9][0-9]", c("AAAPNAAA","XPX28XXNX","P2N","XXXXX","PN","XXXXX","PN","XXXXX","PN"))
+
+Recherche
+
+
+
+REX_Incidents[liste,]$`IO - Libellé de la ressource`
+
+strsplit(c("a,b", "c,d", "e,f,g"), ",")
+
+
+REX_Incidents[,13]
+str(REX_Incidents[,13])
+nchar(REX_Incidents[7,13])
+
+
+?read.csv
+#REX_Incidents <- read.csv("../data/REX_Incidents.csv", sep = ";",nrows = 200,
+#                          fileEncoding = "UTF-8")
+
+
+
+liste_champs <- c("annonce","annonces","anonce","barrière","barriere","barières"
+                  ,"barieres","barr","bar","commutateur","comutateur","route"
+                  ,"routier","mécanisme","mecanisme","niveau","PN","relais","raté"
+                  ,"rate","ouverture","fermeture")
+  
+
+
+
+# ------------------------------------------------------------------------------
+
 # Tentative d'association d'un actif AVP PN à un incident 
 
-REX_Incidents <- read.csv("../data/REX_Incidents.csv", sep = ";",check.names = FALSE)
 str(REX_Incidents)
 
 # Quelques test pour qiuelques exemples ...
@@ -367,6 +696,8 @@ Liste_PNxxx_voisins(586796.1,6816543,12,20000)
 str(Liste_PN)
 REX_Incidents_PN <- read.csv("../data/REX_Incidents_PN2.csv", sep = ";",check.names = FALSE)
 str(REX_Incidents_PN)
+
+
 #REX_Incidents_PN <- read.csv("../data/REX_Incidents_PN2.csv", sep = ";",check.names = FALSE,
 #                             colClasses = c("integer","integer","character","character","integer","numeric","numeric"))
 str(REX_Incidents_PN)
